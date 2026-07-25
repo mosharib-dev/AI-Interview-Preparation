@@ -220,6 +220,12 @@ $font-stack:     system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Robot
         background-color: rgba($accent, 0.05);
     }
 
+    &--dragging {
+        border-color: $accent;
+        background-color: rgba($accent, 0.08);
+        transform: scale(1.01);
+    }
+
     &__icon {
         color: $accent;
         margin-bottom: 0.25rem;
@@ -236,6 +242,86 @@ $font-stack:     system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Robot
         font-size: 0.75rem;
         color: $text-muted;
         margin: 0;
+    }
+
+    // ── Filled state (file selected) ──
+    &--filled {
+        flex-direction: row;
+        align-items: center;
+        justify-content: flex-start;
+        gap: 0.75rem;
+        padding: 0.85rem 1rem;
+        border-style: solid;
+        border-color: rgba(#3fb950, 0.4);
+        background-color: rgba(#3fb950, 0.07);
+        cursor: default;
+
+        &:hover {
+            border-color: rgba(#3fb950, 0.4);
+            background-color: rgba(#3fb950, 0.07);
+        }
+    }
+}
+
+.file-preview {
+    &__icon {
+        flex-shrink: 0;
+        display: flex;
+        color: #3fb950;
+    }
+
+    &__meta {
+        flex: 1;
+        min-width: 0;
+        text-align: left;
+    }
+
+    &__name {
+        font-size: 0.85rem;
+        font-weight: 500;
+        color: $text-primary;
+        margin: 0;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    &__size {
+        font-size: 0.75rem;
+        color: #6fcf7d;
+        margin: 0.15rem 0 0;
+    }
+
+    &__check {
+        flex-shrink: 0;
+        width: 1.35rem;
+        height: 1.35rem;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background-color: #3fb950;
+        color: #0d1117;
+    }
+
+    &__remove {
+        flex-shrink: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 1.5rem;
+        height: 1.5rem;
+        border: none;
+        border-radius: 0.35rem;
+        background: transparent;
+        color: $text-muted;
+        cursor: pointer;
+        transition: color 0.2s, background-color 0.2s;
+
+        &:hover {
+            color: #ff6b6b;
+            background-color: rgba(#ff6b6b, 0.12);
+        }
     }
 }
 
@@ -317,6 +403,12 @@ $font-stack:     system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Robot
 
     &:active {
         transform: scale(0.98);
+    }
+
+    &:disabled {
+        opacity: 0.45;
+        cursor: not-allowed;
+        transform: none;
     }
 }
 
