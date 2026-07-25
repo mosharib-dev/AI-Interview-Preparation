@@ -3,17 +3,31 @@
     outline: none;
     padding-inline: 1.5rem;
     padding-block: 0.75rem;
-    border-radius: 1rem;
+    border-radius: 0.75rem;
     cursor: pointer;
+    font-family: var(--font-stack);
+    font-weight: 600;
+    font-size: 0.9rem;
 
-    transition: all 0.3s ease-in-out;
+    transition: all 0.2s ease-in-out;
 
     &.primary-button{
-        background-color: #e1034d;
+        background: linear-gradient(135deg, var(--accent) 0%, #d41f60 100%);
         color: white;
+        box-shadow: 0 8px 20px -8px rgba(255, 45, 120, 0.55);
+
+        &:hover:not(:disabled){
+            filter: brightness(1.08);
+            box-shadow: 0 10px 24px -8px rgba(255, 45, 120, 0.65);
+        }
     }
 
-    &:active{
-        transform: scale(0.9);
+    &:active:not(:disabled){
+        transform: scale(0.96);
+    }
+
+    &:disabled{
+        opacity: 0.6;
+        cursor: not-allowed;
     }
 }
