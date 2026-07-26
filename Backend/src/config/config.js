@@ -12,12 +12,19 @@ if(!process.env.JWT_SECRET) {
 
 if(!process.env.GOOGLE_GENAI_API_KEY) {
     throw new Error ("Gemini API Key not defined in environment variable");
+
+}
+
+if(!process.env.CLIENT_URL) {
+    throw new Error ("Client URL not defined in environment variable");
+
 }
 
 const config = {
     MONGO_URI : process.env.MONGO_URI,
     JWT_SECRET: process.env.JWT_SECRET,
-    GOOGLE_GENAI_API_KEY : process.env.GOOGLE_GENAI_API_KEY
+    GOOGLE_GENAI_API_KEY : process.env.GOOGLE_GENAI_API_KEY,
+    CLIENT_URL : process.env.CLIENT_URL
 }
 
 module.exports = config;
