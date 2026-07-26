@@ -4,6 +4,12 @@ const jwt = require("jsonwebtoken");
 const config = require("../config/config");
 const tokenBlackListModel = require("../models/blacklist.model");
 
+const isProduction = config.NODE_ENV === "production";
+
+const cookieOptions = isProduction
+    ? { httpOnly: true, secure: true, sameSite: "none" }
+    : { httpOnly: true };
+
 async function registerUserController (req,res){
     const { username, email, password} = req.body;
 
@@ -38,7 +44,7 @@ async function registerUserController (req,res){
         {expiresIn : "1d"}
     )
 
-    res.cookie("token",token)
+    res.cookie("token",token,cookieOptions);
 
     res.status(201).json({
         message : "User Registered Successfully",
@@ -85,7 +91,7 @@ async function loginUserController (req,res) {
         {expiresIn :"1d"}
     )
 
-    res.cookie("token", token);
+    res.cookie("token", token,cookieOptions);
 
     res.status(200).json({
         message: "LoggedIn Successfully",
@@ -105,7 +111,7 @@ async function logoutUserController(req, res) {
         await tokenBlackListModel.create({ token })
     }
 
-    res.clearCookie("token");
+    res.clearCookie("token",cookieOptions);
     res.status(200).json({
         message : "User LoggedOut Successfully"
     })
