@@ -1,6 +1,7 @@
 const { GoogleGenAI, Type } = require("@google/genai")
 const { z } = require("zod")
-const puppeteer = require("puppeteer")
+const puppeteer = require("puppeteer-core")
+const chromium = require("@sparticuz/chromium").default
 const config = require("../config/config");
 
 const ai = new GoogleGenAI({
@@ -129,20 +130,20 @@ async function generatePdfFromHtml(htmlContent) {
     let browser
     try {
         browser = await puppeteer.launch({
-            headless: "new",
-            args: [
-                "--no-sandbox",
-                "--disable-setuid-sandbox",
-                "--disable-dev-shm-usage",
-                "--disable-gpu"
-            ]
+            args: chromium.args,
+            defaultViewport: chromium.defaultViewport,
+            executablePath: await chromium.executablePath(),
+            headless: chromium.headless,
         })
         const page = await browser.newPage();
         await page.setContent(htmlContent, { waitUntil: "networkidle0" })
 
         const pdfBuffer = await page.pdf({
             format: "A4", margin: {
-                top: "20mm", bottom: "20mm", left: "15mm", right: "15mm"
+                top: "20mm",
+                bottom: "20mm",
+                left: "15mm",
+                right: "15mm"
             }
         })
 
