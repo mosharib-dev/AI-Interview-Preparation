@@ -6,7 +6,7 @@ A MERN-style app — Express/MongoDB API on the backend, a Vite + React 19 SPA o
  
 ## 🔗 Live Demo
  
-[https://ai-interview-preparation-phi.vercel.app/login](https://ai-interview-preparation-phi.vercel.app/login)
+[https://ai-interview-preparation-phi.vercel.app/login](https://ai-interview-preparation-phi.vercel.app/)
  
 ## 🧱 Tech stack
  
