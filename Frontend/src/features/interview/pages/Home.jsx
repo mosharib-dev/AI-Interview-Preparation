@@ -2,6 +2,7 @@ import { useState, useRef } from 'react'
 import "../style/home.scss"
 import { useInterview } from '../hooks/useInterview.js'
 import { useNavigate } from 'react-router'
+import LoadingScreen from '../components/LoadingScreen.jsx'
 
 const formatFileSize = (bytes) => {
     if (bytes < 1024) return `${bytes} B`
@@ -57,12 +58,8 @@ const Home = () => {
         navigate(`/interview/${data._id}`)
     }
 
-    if (loading) {
-        return (
-            <main className='loading-screen'>
-                <h1>Loading your interview plan...</h1>
-            </main>
-        )
+        if (loading) {
+        return <LoadingScreen title='Crafting Your Interview Plan' />
     }
 
     return (
