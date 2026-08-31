@@ -76,7 +76,11 @@ const Home = () => {
         }
     }
 
+<<<<<<< HEAD
     if (loading) {
+=======
+        if (loading) {
+>>>>>>> 922e67fa2506a5acdf70891b630d6eba2c788f53
         return <LoadingScreen title='Crafting Your Interview Plan' />
     }
 

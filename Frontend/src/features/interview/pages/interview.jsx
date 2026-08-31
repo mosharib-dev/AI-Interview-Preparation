@@ -1,7 +1,12 @@
 import  { useState, useEffect } from 'react'
 import '../style/interview.scss'
+<<<<<<< HEAD
 import { useInterview, getErrorMessage } from '../hooks/useInterview.js'
 import { useParams, Link } from 'react-router'
+=======
+import { useInterview } from '../hooks/useInterview.js'
+import { useNavigate, useParams } from 'react-router'
+>>>>>>> 922e67fa2506a5acdf70891b630d6eba2c788f53
 import LoadingScreen from '../components/LoadingScreen.jsx'
 
 
@@ -80,7 +85,13 @@ const Interview = () => {
         // eslint-disable-next-line react-hooks/exhaustive-deps -- getReportById is recreated each render but stable in behavior; re-running only on id change is intentional
     }, [ interviewId ])
 
+<<<<<<< HEAD
     if (loading) {
+=======
+
+
+        if (loading || !report) {
+>>>>>>> 922e67fa2506a5acdf70891b630d6eba2c788f53
         return (
             <LoadingScreen
                 title='Preparing Your Interview Report'
@@ -91,6 +102,7 @@ const Interview = () => {
                     'Compiling your roadmap...',
                 ]}
             />
+<<<<<<< HEAD
         )
     }
 
@@ -107,6 +119,8 @@ const Interview = () => {
                     <Link to='/' className='button primary-button'>Back to Home</Link>
                 </div>
             </main>
+=======
+>>>>>>> 922e67fa2506a5acdf70891b630d6eba2c788f53
         )
     }
 
