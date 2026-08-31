@@ -4,6 +4,7 @@ import './auth-loading.scss'
 const STATUS_MESSAGES = [
     'Connecting to server...',
     'Verifying your session...',
+    'This can take up to a minute if the server was asleep...',
     'Almost there...',
 ]
 
