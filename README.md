@@ -4,15 +4,9 @@ Upload a job description and your resume (or a quick self-description), and Inte
  
 A MERN-style app — Express/MongoDB API on the backend, a Vite + React 19 SPA on the frontend, powered by Google's Gemini API for report generation.
  
-## ✨ What's new in this update
+## 🔗 Live Demo
  
-The auth screens (Login / Register) were the roughest part of the UI — plain, unbranded forms with no visual connection to the rest of the app. This pass:
- 
-- Redesigned **Login** and **Register** as a split-panel layout (branding panel + form panel) matching the dark theme already used on the Home and Interview report pages.
-- Added icon-prefixed inputs, a show/hide password toggle, inline error messaging, and a loading state on the submit button.
-- Unified the color palette into shared design tokens (`src/style.scss`) so every page (Home, Interview, Login, Register) now pulls from the same background, accent, and text colors instead of three slightly different palettes.
-- Refreshed the shared `.primary-button` style (gradient, hover/disabled states) used across the whole app.
-Home and the Interview report page already used a solid dark UI — those were left as-is aside from the shared token cleanup.
+[https://ai-interview-preparation-phi.vercel.app/login](https://ai-interview-preparation-phi.vercel.app/)
  
 ## 🧱 Tech stack
  
@@ -108,4 +102,3 @@ Shared across pages via `Frontend/src/style.scss` and mirrored as Sass variables
  
 - `src/main.jsx` and `src/App.jsx` both wrap the tree in `AuthProvider` — harmless (the inner provider just takes precedence) but redundant, worth cleaning up.
 - Login/Register currently show a generic error message on failure since `useAuth`'s `handleLogin`/`handleRegister` swallow the underlying API error rather than re-throwing it with a message. Surfacing the real server message (e.g. "email already in use") would need a small tweak to `useAuth.js`.
- 

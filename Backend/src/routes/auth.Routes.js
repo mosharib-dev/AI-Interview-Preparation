@@ -1,16 +1,24 @@
 const express = require("express");
 const authController = require("../controllers/auth.controller");
 const authMiddleware = require("../middlewares/auth.middleware");
+const { createRateLimiter } = require("../middlewares/rateLimit.middleware");
 
 const authRouter = express.Router();
 
+// limit brute-force / credential-stuffing attempts on auth endpoints
+const authRateLimiter = createRateLimiter({
+    windowMs: 15 * 60 * 1000, // 15 minutes
+    max: 10,
+    message: "Too many attempts. Please wait a few minutes and try again."
+});
+
 // post request for register a new user
 
-authRouter.post("/register",authController.registerUserController);
+authRouter.post("/register",authRateLimiter,authController.registerUserController);
 
 // Post request for login
 
-authRouter.post("/login",authController.loginUserController);
+authRouter.post("/login",authRateLimiter,authController.loginUserController);
 
 // Get request for logout
 

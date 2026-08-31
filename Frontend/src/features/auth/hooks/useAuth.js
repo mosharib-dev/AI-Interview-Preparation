@@ -2,7 +2,13 @@ import { useContext, useEffect } from "react";
 import { AuthContext } from "../auth.context";
 import { login, register, logout, getMe } from "../services/auth.api";
 
-
+// Pulls a friendly message out of an axios error, falling back sensibly
+// when the backend is unreachable or returns something unexpected.
+export function getErrorMessage(err, fallback = "Something went wrong. Please try again.") {
+    if (err?.response?.data?.message) return err.response.data.message
+    if (err?.request && !err?.response) return "Can't reach the server. Please check your connection and try again."
+    return fallback
+}
 
 export const useAuth = () => {
 
@@ -14,8 +20,7 @@ export const useAuth = () => {
         try {
             const data = await login({ email, password })
             setUser(data.user)
-        } catch (err) {
-            console.log(err);
+            return data.user
         } finally {
             setLoading(false)
         }
@@ -26,8 +31,7 @@ export const useAuth = () => {
         try {
             const data = await register({ username, email, password })
             setUser(data.user)
-        } catch (err) {
-            console.log(err);
+            return data.user
         } finally {
             setLoading(false)
         }
@@ -36,10 +40,8 @@ export const useAuth = () => {
     const handleLogout = async () => {
         setLoading(true)
         try {
-            const data = await logout()
+            await logout()
             setUser(null)
-        } catch (err) {
-            console.log(err);
         } finally {
             setLoading(false)
         }
@@ -49,11 +51,13 @@ export const useAuth = () => {
 
         const getAndSetUser = async () => {
             try {
-
                 const data = await getMe()
                 setUser(data.user)
-            } catch (err) { 
-                console.log(err);
+            } catch {
+                // A failed getMe() on first load just means "not logged in" —
+                // this one is fine to swallow since Protected.jsx already
+                // reacts correctly to `user` staying null.
+                setUser(null)
             } finally {
                 setLoading(false)
             }
@@ -61,6 +65,7 @@ export const useAuth = () => {
 
         getAndSetUser()
 
+        // eslint-disable-next-line react-hooks/exhaustive-deps -- setUser/setLoading are stable context setters
     }, [])
 
     return { user, loading, handleRegister, handleLogin, handleLogout }

@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useNavigate, Link } from 'react-router'
 import "../auth.form.scss"
-import { useAuth } from '../hooks/useAuth'
+import { useAuth, getErrorMessage } from '../hooks/useAuth'
 
 const UserIcon = () => (
     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" /><circle cx="12" cy="7" r="4" /></svg>
@@ -43,7 +43,7 @@ const Register = () => {
             await handleRegister({ username, email, password })
             navigate("/")
         } catch (err) {
-            setError("Couldn't create your account. Please check your details and try again.")
+            setError(getErrorMessage(err, "Couldn't create your account. Please check your details and try again."))
         }
     }
 
@@ -117,7 +117,7 @@ const Register = () => {
                                     <input
                                         onChange={(e) => { setPassword(e.target.value) }}
                                         value={password}
-                                        type={showPassword ? "text" : "password"} id="password" name="password" placeholder="Create a password" required />
+                                        type={showPassword ? "text" : "password"} id="password" name="password" placeholder="Create a password" minLength={8} required />
                                     <button
                                         type="button"
                                         className="password-toggle"
@@ -127,6 +127,7 @@ const Register = () => {
                                         {showPassword ? <EyeOffIcon /> : <EyeIcon />}
                                     </button>
                                 </div>
+                                <p className="field-hint">Must be at least 8 characters.</p>
                             </div>
 
                             <button className="button primary-button" type="submit" disabled={loading}>

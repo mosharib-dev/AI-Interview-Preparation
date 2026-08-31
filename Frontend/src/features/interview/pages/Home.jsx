@@ -1,7 +1,8 @@
 import { useState, useRef } from 'react'
 import "../style/home.scss"
-import { useInterview } from '../hooks/useInterview.js'
+import { useInterview, getErrorMessage } from '../hooks/useInterview.js'
 import { useNavigate } from 'react-router'
+import LoadingScreen from '../components/LoadingScreen.jsx'
 
 const formatFileSize = (bytes) => {
     if (bytes < 1024) return `${bytes} B`
@@ -11,18 +12,27 @@ const formatFileSize = (bytes) => {
 
 const Home = () => {
 
-    const { loading, generateReport,reports } = useInterview()
+    const { loading, generateReport, reports } = useInterview()
     const [ jobDescription, setJobDescription ] = useState("")
     const [ selfDescription, setSelfDescription ] = useState("")
     const [ resumeFile, setResumeFile ] = useState(null)
     const [ isDragging, setIsDragging ] = useState(false)
+    const [ generationError, setGenerationError ] = useState("")
     const resumeInputRef = useRef()
 
     const navigate = useNavigate()
 
+    const isPdf = (file) => file.type === "application/pdf" || file.name?.toLowerCase().endsWith(".pdf")
+
     const handleFileChange = (e) => {
         const file = e.target.files[ 0 ]
-        if (file) setResumeFile(file)
+        if (!file) return
+        if (!isPdf(file)) {
+            setGenerationError("Only PDF resumes are supported. Please choose a .pdf file, or use the self-description field instead.")
+            return
+        }
+        setGenerationError("")
+        setResumeFile(file)
     }
 
     const handleRemoveFile = (e) => {
@@ -46,23 +56,28 @@ const Home = () => {
         e.preventDefault()
         setIsDragging(false)
         const file = e.dataTransfer.files[ 0 ]
-        if (file) {
-            setResumeFile(file)
-            if (resumeInputRef.current) resumeInputRef.current.files = e.dataTransfer.files
+        if (!file) return
+        if (!isPdf(file)) {
+            setGenerationError("Only PDF resumes are supported. Please choose a .pdf file, or use the self-description field instead.")
+            return
         }
+        setGenerationError("")
+        setResumeFile(file)
+        if (resumeInputRef.current) resumeInputRef.current.files = e.dataTransfer.files
     }
 
     const handleGenerateReport = async () => {
-        const data = await generateReport({ jobDescription, selfDescription, resumeFile })
-        navigate(`/interview/${data._id}`)
+        setGenerationError("")
+        try {
+            const data = await generateReport({ jobDescription, selfDescription, resumeFile })
+            navigate(`/interview/${data._id}`)
+        } catch (err) {
+            setGenerationError(getErrorMessage(err, "Couldn't generate your interview plan. Please try again."))
+        }
     }
 
     if (loading) {
-        return (
-            <main className='loading-screen'>
-                <h1>Loading your interview plan...</h1>
-            </main>
-        )
+        return <LoadingScreen title='Crafting Your Interview Plan' />
     }
 
     return (
@@ -73,6 +88,12 @@ const Home = () => {
                 <h1>Create Your Custom <span className='highlight'>Interview Plan</span></h1>
                 <p>Let our AI analyze the job requirements and your unique profile to build a winning strategy.</p>
             </header>
+
+            {generationError && (
+                <div className='generation-error' role='alert'>
+                    {generationError}
+                </div>
+            )}
 
             {/* Main Card */}
             <div className='interview-card'>
@@ -144,11 +165,11 @@ const Home = () => {
                                         <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="16 16 12 12 8 16" /><line x1="12" y1="12" x2="12" y2="21" /><path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3" /></svg>
                                     </span>
                                     <p className='dropzone__title'>Click to upload or drag &amp; drop</p>
-                                    <p className='dropzone__subtitle'>PDF or DOCX (Max 5MB)</p>
+                                    <p className='dropzone__subtitle'>PDF only (Max 5MB)</p>
                                     <input
                                         ref={resumeInputRef}
                                         onChange={handleFileChange}
-                                        hidden type='file' id='resume' name='resume' accept='.pdf,.docx' />
+                                        hidden type='file' id='resume' name='resume' accept='.pdf' />
                                 </label>
                             )}
                         </div>

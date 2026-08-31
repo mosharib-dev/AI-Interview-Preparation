@@ -1,22 +1,45 @@
 const pdfParse = require("pdf-parse")
 const { generateInterviewReport, generateResumePdf } = require("../services/ai.service")
 const interviewReportModel = require("../models/interviewReport.model")
-
+const { httpError } = require("../middlewares/error.middleware")
 
 async function generateInterViewReportController(req, res) {
 
-    const resumeContent = await (new pdfParse.PDFParse(Uint8Array.from(req.file.buffer))).getText()
     const { selfDescription, jobDescription } = req.body
 
+    if (!jobDescription || !jobDescription.trim()) {
+        throw httpError(400, "Job description is required.")
+    }
+
+    // Either a resume file OR a self-description must be provided
+    if (!req.file && (!selfDescription || !selfDescription.trim())) {
+        throw httpError(400, "Please upload a resume or provide a self-description.")
+    }
+
+    let resumeText = ""
+    if (req.file) {
+        try {
+            const parsed = await (new pdfParse.PDFParse(Uint8Array.from(req.file.buffer))).getText()
+            resumeText = parsed.text
+        } catch (err) {
+            console.error("PDF parsing failed:", err)
+            throw httpError(400, "We couldn't read that PDF. Please make sure it isn't password-protected or corrupted, and try again.")
+        }
+
+        if (!resumeText || !resumeText.trim()) {
+            throw httpError(400, "Your resume PDF appears to be empty or unreadable (e.g. a scanned image). Please try a text-based PDF, or use the self-description field instead.")
+        }
+    }
+
     const interViewReportByAi = await generateInterviewReport({
-        resume: resumeContent.text,
+        resume: resumeText,
         selfDescription,
         jobDescription
     })
 
     const interviewReport = await interviewReportModel.create({
         user: req.user.id,
-        resume: resumeContent.text,
+        resume: resumeText,
         selfDescription,
         jobDescription,
         ...interViewReportByAi
@@ -36,9 +59,7 @@ async function getInterviewReportByIdController(req, res) {
     const interviewReport = await interviewReportModel.findOne({ _id: interviewId, user: req.user.id })
 
     if (!interviewReport) {
-        return res.status(404).json({
-            message: "Interview report not found."
-        })
+        throw httpError(404, "Interview report not found.")
     }
 
     res.status(200).json({
@@ -61,32 +82,26 @@ async function getAllInterviewReportsController(req, res) {
 async function generateResumePdfController(req, res) {
     const { interviewReportId } = req.params
 
-    try {
-        const interviewReport = await interviewReportModel.findById(interviewReportId)
+    // BUG FIX: this used to be `findById(interviewReportId)` with no
+    // ownership check, meaning ANY logged-in user could download ANY
+    // other user's tailored resume just by guessing/incrementing an id
+    // (an IDOR vulnerability). Scoping the query to req.user.id closes it.
+    const interviewReport = await interviewReportModel.findOne({ _id: interviewReportId, user: req.user.id })
 
-        if (!interviewReport) {
-            return res.status(404).json({
-                message: "Interview report not found."
-            })
-        }
-
-        const { resume, jobDescription, selfDescription } = interviewReport
-
-        const pdfBuffer = await generateResumePdf({ resume, jobDescription, selfDescription })
-
-        res.set({
-            "Content-Type": "application/pdf",
-            "Content-Disposition": `attachment; filename=resume_${interviewReportId}.pdf`
-        })
-
-        res.send(pdfBuffer)
-    } catch (err) {
-        console.error("generateResumePdfController error:", err)
-        res.status(500).json({
-            message: "Failed to generate resume PDF. Please try again.",
-            error: err.message
-        })
+    if (!interviewReport) {
+        throw httpError(404, "Interview report not found.")
     }
+
+    const { resume, jobDescription, selfDescription } = interviewReport
+
+    const pdfBuffer = await generateResumePdf({ resume, jobDescription, selfDescription })
+
+    res.set({
+        "Content-Type": "application/pdf",
+        "Content-Disposition": `attachment; filename=resume_${interviewReportId}.pdf`
+    })
+
+    res.send(pdfBuffer)
 }
 
 module.exports = { generateInterViewReportController, getInterviewReportByIdController, getAllInterviewReportsController, generateResumePdfController }
