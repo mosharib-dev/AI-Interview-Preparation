@@ -7,7 +7,20 @@ const { httpError } = require("../middlewares/error.middleware");
 
 const isProduction = config.NODE_ENV === "production";
 
-const cookieOptions = isProduction
+// Cross-site cookies (frontend and backend on different domains, which is
+// the normal case for a deployed app — e.g. frontend on Vercel, backend on
+// Render) REQUIRE `sameSite: "none"` + `secure: true`, or the browser will
+// silently refuse to send the cookie on any fetch/XHR request that isn't a
+// same-site top-level navigation. Relying solely on `NODE_ENV === "production"`
+// is fragile — some hosting platforms don't set NODE_ENV unless you do it
+// yourself — so we also treat any non-localhost CLIENT_URL as needing the
+// cross-site-safe settings. If CLIENT_URL looks like localhost, we assume
+// local development over plain HTTP and skip `secure`/`sameSite: "none"`
+// (browsers reject Secure cookies on non-HTTPS origins).
+const isLocalClient = /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/i.test(config.CLIENT_URL || "");
+const needsCrossSiteCookie = isProduction || !isLocalClient;
+
+const cookieOptions = needsCrossSiteCookie
     ? { httpOnly: true, secure: true, sameSite: "none" }
     : { httpOnly: true };
 
