@@ -2,6 +2,9 @@ $bg-page:      #0d1117;
 $border-color: #2a3348;
 $accent:       #ff2d78;
 $accent-alt:   #ff6b9d;
+$text-muted:   #7d8590;
+$text-primary: #e6edf3;
+$font-stack:   system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 
 .auth-loading {
     width: 100%;
@@ -10,15 +13,39 @@ $accent-alt:   #ff6b9d;
     align-items: center;
     justify-content: center;
     background-color: $bg-page;
+    font-family: $font-stack;
+
+    &__content {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 1.5rem;
+        animation: auth-loading-fade-in 0.3s ease;
+    }
+
+    &__brand {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        color: $text-primary;
+        font-weight: 700;
+        font-size: 1rem;
+        letter-spacing: 0.01em;
+    }
+
+    &__brand-icon {
+        color: $accent;
+        display: flex;
+        animation: auth-loading-pulse 1.4s ease-in-out infinite;
+    }
 
     &__spinner {
         position: relative;
-        width: 44px;
-        height: 44px;
+        width: 40px;
+        height: 40px;
         display: flex;
         align-items: center;
         justify-content: center;
-        animation: auth-loading-fade-in 0.25s ease;
     }
 
     &__ring {
@@ -31,11 +58,11 @@ $accent-alt:   #ff6b9d;
         animation: auth-loading-spin 0.8s linear infinite;
     }
 
-    &__icon {
-        position: relative;
-        z-index: 1;
-        color: $accent;
-        animation: auth-loading-pulse 1.4s ease-in-out infinite;
+    &__status {
+        color: $text-muted;
+        font-size: 0.85rem;
+        min-height: 1.2em;
+        animation: auth-loading-text-fade 0.4s ease;
     }
 }
 
@@ -51,4 +78,9 @@ $accent-alt:   #ff6b9d;
 @keyframes auth-loading-fade-in {
     from { opacity: 0; }
     to { opacity: 1; }
+}
+
+@keyframes auth-loading-text-fade {
+    from { opacity: 0; transform: translateY(2px); }
+    to { opacity: 1; transform: translateY(0); }
 }
