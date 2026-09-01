@@ -1,3 +1,5 @@
+![CI](https://github.com/mosharib-dev/AI-Interview-Preparation/actions/workflows/ci.yml/badge.svg)
+
 # InterviewAI — AI Interview Preparation
  
 Upload a job description and your resume (or a quick self-description), and InterviewAI generates a tailored interview prep plan: technical & behavioral questions with model answers, a resume-to-job match score, skill-gap analysis, and a day-by-day preparation roadmap.
