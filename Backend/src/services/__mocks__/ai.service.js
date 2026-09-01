@@ -1,5 +1,6 @@
 module.exports = {
     generateInterviewReport: jest.fn().mockResolvedValue({
+        title: "Senior Backend Engineer",
         technicalQuestions: [{ question: "Explain closures", intention: "test", answer: "test answer" }],
         behavioralQuestions: [{ question: "Tell me about a challenge", intention: "test", answer: "test answer" }],
         matchScore: 82,
