@@ -6,11 +6,13 @@ const { createRateLimiter } = require("../middlewares/rateLimit.middleware");
 const authRouter = express.Router();
 
 // limit brute-force / credential-stuffing attempts on auth endpoints
-const authRateLimiter = createRateLimiter({
-    windowMs: 15 * 60 * 1000, // 15 minutes
-    max: 10,
-    message: "Too many attempts. Please wait a few minutes and try again."
-});
+const authRateLimiter = process.env.NODE_ENV === "test"
+    ? (req, res, next) => next()
+    : createRateLimiter({
+        windowMs: 15 * 60 * 1000, // 15 minutes
+        max: 10,
+        message: "Too many attempts. Please wait a few minutes and try again."
+    });
 
 // post request for register a new user
 
